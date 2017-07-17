@@ -1,37 +1,82 @@
-## Welcome to GitHub Pages
+## 允许redis可以在远程IP连接
 
-You can use the [editor on GitHub](https://github.com/zhpanjun/node/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+> 默认情况下，redis从3.2开始只能在本机连接。也就是说你redis服务器装到哪里，代码也只能在哪里。
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+1.  安装
 
-### Markdown
+	
+	composer require predis/predis
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
+  2. 修改配置文件
 
-# Header 1
-## Header 2
-### Header 3
+		修改env文件
+			REDIS_HOST=192.168.17.148
 
-- Bulleted
-- List
+  3. 开始使用
 
-1. Numbered
-2. List
+			//将a,b, c,d存放到列表
+    	//列表特点： 两端都可以放、取。可以模拟队列、栈
 
-**Bold** and _Italic_ and `Code` text
+    	// Redis::lpush('k1', array('a', 'b', 'c'));//lpush key a  b  c
 
-[Link](url) and ![Image](src)
-```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+    	// Redis::set('name', 'jack');//get key      set key value
 
-### Jekyll Themes
+### 修改步骤如下
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/zhpanjun/node/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
-### Support or Contact
+1. 修改配置文件
+	cp /usr/local/redis-3.2.8/redis.conf redis.conf.bak
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+		# vim  /usr/local/redis-3.2.8/redis.conf
+	
+			将bind 127.0.0.1 注释
+	        
+	        protected-mode yes  的 yes 改为 no
+
+2. 重启redis
+
+    	# redis-cli shutdown
+
+     //指定配置文件启动
+    	# redis-server /usr/local/redis-3.2.8/redis.conf &
+
+
+## 在Laravel中如何使用phpredis扩展
+
+	1. 前提是安装了phpredis扩展，并且启动了
+
+		//检查是否安装
+		# php -m | grep redis
+
+		如果输出redis就意味安装并且开启了
+
+    2. 修改laravel框架的配置
+
+		a. 将config/app.php中的aliases部分的Redis改名为其他名字，比如Predis
+
+		b. 在config/database中的配置文件中的redis部分添加：
+
+			'client' => 'phpredis',
+
+
+	3. 可以使用了
+
+		比如在任意一个控制器方法中写以下代码:
+	
+			$redis = new \Redis;
+
+			$redis->connect('localhost', 6379);
+
+			//获取到name的值
+			$redis->get('name');
+
+
+
+
+			
+
+			
+
+  
